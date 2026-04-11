@@ -1,22 +1,40 @@
-import cv2 as cv
-import matplotlib.pyplot as plt
+from __future__ import annotations
 
-import glob
+import argparse
 
-imgs = []
-
-folder_path = '/home/enkush-3/Documents/University_3_1/Computer_vision/Biy_Daalt_v0.2/Dataset/'
-for img_path in glob.glob(folder_path + '*.jpg'):
-    img = cv.imread(img_path)
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    imgs.append(gray)
+from utils.io_handler import IOHandler
 
 
-akaze = cv.AKAZE_create()
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="2D image to 3D object pipeline entrypoint")
+    parser.add_argument("--input-dir", default="data/inputs", help="Input images directory")
+    parser.add_argument("--output-dir", default="data/outputs", help="Output directory")
+    parser.add_argument("--max-images", type=int, default=None, help="Optional maximum number of images to load")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Only load and validate input images without running reconstruction",
+    )
+    return parser
 
-imgs_key_points = []
-imgs_descriptor = []
-for img in imgs:
-    kp_akaze, des_akaze = akaze.detectAndCompute(img, None)
-    imgs_key_points.append(kp_akaze)
-    imgs_descriptor.append(des_akaze)
+
+def main() -> None:
+    args = build_arg_parser().parse_args()
+
+    io_handler = IOHandler(input_dir=args.input_dir, output_dir=args.output_dir)
+    images, image_names = io_handler.load_images(max_images=args.max_images)
+    io_handler.ensure_output_dir()
+
+    print(f"Loaded {len(images)} images")
+    print(f"Input names: {', '.join(image_names)}")
+
+    if args.dry_run:
+        print("Dry run completed. Images and folders are ready.")
+        return
+
+    print("Feature extraction -> Geometry reconstruction -> Surface generation")
+    print("Pipeline skeleton is ready. Implement module engines to produce final 3D object.")
+
+
+if __name__ == "__main__":
+    main()
