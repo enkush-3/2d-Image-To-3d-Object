@@ -1,4 +1,6 @@
 from __future__ import annotations
+from modules.feature_engine import Feature_Engine
+from utils.saving_data.feature_storage import FeatureStorage
 
 import argparse
 
@@ -25,8 +27,23 @@ def main() -> None:
     images, image_names = io_handler.load_images(max_images=args.max_images)
     io_handler.ensure_output_dir()
 
-    print(f"Loaded {len(images)} images")
-    print(f"Input names: {', '.join(image_names)}")
+    feature = Feature_Engine()
+    features = feature.extract_features(images)
+    matches = feature.match_features(features)
+
+    FeatureStorage.save(features, matches, "../" + args.output_dir, base_name="feature_data")
+
+    print(f"\n[Төлөв] Нийт {len(images)} зураг ачаалагдсан.")
+    print(f"[Төлөв] Онцлог танигдсан зураг: {len(features)}")
+    print(f"[Төлөв] Баталгаажсан хослол: {len(matches)}")
+
+    if args.dry_run:
+        print("Dry run хийгдлээ. Зураг, хавтас бэлэн.")
+        return
+
+    print("\nОнцлог таних -> Геометр сэргээх -> Гадаргуу үүсгэх")
+    print("Pipeline skeleton бэлэн. Үргэлжлүүлэн geometry/surface engine-уудыг хэрэгжүүлнэ үү.")
+
 
     if args.dry_run:
         print("Dry run completed. Images and folders are ready.")
@@ -34,7 +51,6 @@ def main() -> None:
 
     print("Feature extraction -> Geometry reconstruction -> Surface generation")
     print("Pipeline skeleton is ready. Implement module engines to produce final 3D object.")
-
 
 if __name__ == "__main__":
     main()

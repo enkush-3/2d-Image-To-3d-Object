@@ -8,14 +8,15 @@ from typing import List, Optional, Sequence, Tuple
 import numpy as np
 
 
+
 DEFAULT_IMAGE_EXTENSIONS: Tuple[str, ...] = (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff")
 
 
 class IOHandler:
     def __init__(
         self,
-        input_dir: str = "data/inputs",
-        output_dir: str = "data/outputs",
+        input_dir: str = "data/inputs/Genshin",
+        output_dir: str = "data/outputs/Genshin",
         image_extensions: Sequence[str] = DEFAULT_IMAGE_EXTENSIONS,
     ) -> None:
         project_root = Path(__file__).resolve().parents[2]
